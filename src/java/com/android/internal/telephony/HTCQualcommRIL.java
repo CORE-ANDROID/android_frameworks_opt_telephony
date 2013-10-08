@@ -56,13 +56,11 @@ public class HTCQualcommRIL extends RIL implements CommandsInterface {
     @Override
     protected Object
     responseIccCardStatus(Parcel p) {
-        // get type from Settings.Global default to CDMA + LTE network mode
+        // force CDMA + LTE network mode
         boolean forceCdmaLte = needsOldRilFeature("forceCdmaLteNetworkType");
+
         if (forceCdmaLte) {
-            int phoneType = android.provider.Settings.Global.getInt(mContext.getContentResolver(),
-                            android.provider.Settings.Global.PREFERRED_NETWORK_MODE,
-                            NETWORK_MODE_LTE_CDMA_EVDO);
-            setPreferredNetworkType(phoneType, null);
+            setPreferredNetworkType(NETWORK_MODE_LTE_CDMA_EVDO, null);
         }
 
         return super.responseIccCardStatus(p);
@@ -98,31 +96,6 @@ public class HTCQualcommRIL extends RIL implements CommandsInterface {
             dataCall.gateways = gateways.split(" ");
         }
         return dataCall;
-    }
-
-    // Ignore invalid CellInfo data rather than throwing exceptions
-    @Override
-    protected ArrayList<CellInfo> responseCellInfoList(Parcel p) {
-        int numberOfInfoRecs;
-        ArrayList<CellInfo> response;
-
-        /**
-         * Loop through all of the information records unmarshalling them
-         * and converting them to Java Objects.
-         */
-        numberOfInfoRecs = p.readInt();
-        response = new ArrayList<CellInfo>(numberOfInfoRecs);
-
-        for (int i = 0; i < numberOfInfoRecs; i++) {
-            int dataPosition = p.dataPosition(); // save position
-            int type = p.readInt();
-            if(type >= 1 && type <= 4) { // Types 1-4 valid; see CellInfo.java
-                p.setDataPosition(dataPosition); // rewind
-                CellInfo InfoRec = CellInfo.CREATOR.createFromParcel(p);
-                response.add(InfoRec);
-            }
-        }
-        return response;
     }
 
     @Override

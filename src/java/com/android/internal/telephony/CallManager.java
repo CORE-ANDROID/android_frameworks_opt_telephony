@@ -417,7 +417,7 @@ public final class CallManager {
                     }
                 }
 
-                if (mSpeedUpAudioForMtCall && lastAudioMode != AudioManager.MODE_IN_CALL) {
+                if (mSpeedUpAudioForMtCall && (curAudioMode != AudioManager.MODE_IN_CALL)) {
                     audioManager.setMode(AudioManager.MODE_IN_CALL);
                 }
                 break;
@@ -434,7 +434,7 @@ public final class CallManager {
                     // enable IN_COMMUNICATION audio mode instead for sipPhone
                     newAudioMode = AudioManager.MODE_IN_COMMUNICATION;
                 }
-                if (lastAudioMode != newAudioMode || mSpeedUpAudioForMtCall) {
+                if (audioManager.getMode() != newAudioMode || mSpeedUpAudioForMtCall) {
                     // request audio focus before setting the new mode
                     if (VDBG) Rlog.d(LOG_TAG, "requestAudioFocus on STREAM_VOICE_CALL");
                     audioManager.requestAudioFocusForCall(AudioManager.STREAM_VOICE_CALL,
